@@ -6,8 +6,9 @@
 //needed for library
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
-#include <ArduinoJson.h> //https://github.com/bblanchon/ArduinoJson
-#include <WiFiManager.h> //https://github.com/tzapu/WiFiManager
+#include <ArduinoJson.h>  //https://github.com/bblanchon/ArduinoJson
+#include <WiFiManager.h>  //https://github.com/tzapu/WiFiManager
+#include "NTPClient.h"    //https://github.com/stelgenhof/NTPClient
 
 #define PIN_SWITCH 5 // ahat: this is GPIO5 = D1 in nodemcu v3
 #define PIN_LED 13
@@ -578,6 +579,9 @@ void setup()
   mqttSetup();
   Serial.println( "mqttSetup finished" );
 
+  NTP.init((char *)"pool.ntp.org", UTC0300);
+  NTP.setPollingInterval(60); // Poll every minute
+
   Serial.println( "Setup done" );
 }
 
@@ -589,5 +593,8 @@ void loop()
   loopReadSensorMqttPublish( true );
 
   loopReadFlash();
+
+  // example use of NTP
+  Serial.printf( "Current time: %s - First synchronized at: %s.\n", NTP.getTimeDate( now() ), NTP.getTimeDate( NTP.getFirstSync() ) );
   // delay( 2000 );
 }
